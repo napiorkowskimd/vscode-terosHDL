@@ -124,6 +124,9 @@ export class Output_channel {
         if (error_message === ERROR_CODE.PYTHON) {
             error_message += `Current Python3 path: ${args}`;
         }
+        if (error_message === ERROR_CODE.FILE_NOT_FOUND) {
+            error_message += `Not found: ${args}`;
+        }
         if (error_message === ERROR_CODE.FILES_IN_PROJECT_NO_EXIST) {
             let error_files = '';
             for (let i = 0; i < args.length - 1; i++) {

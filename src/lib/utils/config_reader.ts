@@ -122,12 +122,31 @@ export class Config_reader {
     return developer_mode;
   }
 
-
+  //////////////////////////////////////////////////////////////////////////////
+  // Tool
+  //////////////////////////////////////////////////////////////////////////////
   get_tool_path(tool) {
     let field = this.get_config_fields(tool);
     return field.installation_path;
   }
 
+  get_selected_tool() {
+    let selected_tool = this.get_config_fields('general').select_tool;
+    return selected_tool;
+  }
+
+  get_config_of_selected_tool() {
+    let selected_tool = this.get_selected_tool();
+    let config_of_selected_tool = this.get_config_fields(selected_tool);
+    if (config_of_selected_tool === undefined) {
+      config_of_selected_tool = {};
+    }
+    return config_of_selected_tool;
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Editor
+  //////////////////////////////////////////////////////////////////////////////
   get_header_path() {
     let field = this.get_config_fields('templates');
     return field.header_file_path;

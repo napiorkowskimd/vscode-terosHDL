@@ -508,14 +508,6 @@ export class Project_manager {
         });
     }
 
-    set_results(force_fail_all) {
-        let tool_configuration = this.config_file.get_config_of_selected_tool();
-        if (tool_configuration === undefined) {
-            return [];
-        }
-        this.tree.set_results(this.last_results, force_fail_all);
-    }
-
     set_top_from_project(project_name, library_name, path) {
         this.edam_project_manager.set_top(project_name, library_name, path);
         this.tree.select_top(project_name, library_name, path);
@@ -548,9 +540,12 @@ export class Project_manager {
         await this.config_reader.check_configuration();
     }
 
+    ////////////////////////////////////////////////////////////////////////////
+    // Update tree
+    ////////////////////////////////////////////////////////////////////////////
     async update_tree() {
         this.update_dependencies_viewer();
-        let test_list_initial = [{ name: "Loading tests...", location: undefined }];
+        let test_list_initial = this.tool_manager.get_initial_test_list();
         let normalized_prjs = this.edam_project_manager.get_normalized_projects();
         // Set "loading test" message
         this.tree.update_super_tree(normalized_prjs, test_list_initial);
@@ -565,14 +560,7 @@ export class Project_manager {
         this.set_default_tops();
         this.set_results(false);
 
-        let test_list: {}[] = [{
-            attributes: undefined,
-            test_type: undefined,
-            name: 'Tool is not configured',
-            location: undefined
-        }];
-
-        test_list = await this.tool_manager.get_test_list();
+        let test_list = await this.tool_manager.get_test_list();
         // Show the test list
         this.tree.update_super_tree(normalized_prjs, test_list);
 
@@ -584,6 +572,15 @@ export class Project_manager {
         this.init_test_list = true;
         await this.set_dependency_tree();
     }
+
+    set_results(force_fail_all) {
+        let tool_configuration = this.config_file.get_config_of_selected_tool();
+        if (tool_configuration === undefined) {
+            return [];
+        }
+        this.tree.set_results(this.last_results, force_fail_all);
+    }
+
 
     async set_dependency_tree() {
         let selected_project = this.edam_project_manager.selected_project;

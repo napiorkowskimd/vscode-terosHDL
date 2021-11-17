@@ -31,6 +31,8 @@ export class Tool_manager {
     private osvvm : Osvvm.Osvvm;
     private edam_project_manager;
     private config_file;
+    private config_reader;
+    private test_list: any[] = [];
 
     constructor(context, output_channel, config_file, config_reader, edam_project_manager){
         this.edam_project_manager = edam_project_manager;
@@ -39,27 +41,21 @@ export class Tool_manager {
         this.cocotb = new Cocotb.Cocotb(context, output_channel, edam_project_manager);
         this.edalize = new Edalize.Edalize(context, output_channel, config_reader, config_file, edam_project_manager);
         this.config_file = config_file;
+        this.config_reader = config_reader;
     }
 
-    get_rerun_testlist() {
-        let tool = this.get_tool();
-        let rerun_testlist = tool.get_rerun_testlist();
-        return rerun_testlist;
+    ////////////////////////////////////////////////////////////////////////////
+    // Getters
+    ////////////////////////////////////////////////////////////////////////////
+    get_test_list() {
+        return this.test_list;
     }
 
-    clear(){
-        this.osvvm.clear();
-        this.edalize.clear();
-    }
 
-    stop(){
-        this.vunit.stop_test();
-        this.cocotb.stop_test();
-        this.edalize.stop_test();
-        this.osvvm.stop_test();
-    }
-
-    async get_test_list(){
+    ////////////////////////////////////////////////////////////////////////////
+    // Runners
+    ////////////////////////////////////////////////////////////////////////////
+    async find_tests(){
         let tool = this.get_tool();
         let test_list = tool.get_test_list();
         return test_list;
@@ -71,21 +67,51 @@ export class Tool_manager {
         return result;
     }
 
-    get_tool(){
-        let tool_configuration = this.config_file.get_config_of_selected_tool();
-        if ('vunit' in tool_configuration) {
+    stop(){
+        this.vunit.stop_test();
+        this.cocotb.stop_test();
+        this.edalize.stop_test();
+        this.osvvm.stop_test();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Setters
+    ////////////////////////////////////////////////////////////////////////////
+    set_empty_test_list(){
+        this.test_list = [];
+    }
+
+    set_loading_test_list(){
+        this.test_list = [{ name: "Loading tests...", location: undefined }];
+    }
+
+    // get_rerun_testlist() {
+    //     let tool = this.get_tool();
+    //     let rerun_testlist = tool.get_rerun_testlist();
+    //     return rerun_testlist;
+    // }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Utils
+    ////////////////////////////////////////////////////////////////////////////
+    clear(){
+        this.osvvm.clear();
+        this.edalize.clear();
+    }
+
+    get_tool() {
+        let selected_tool = this.config_reader.get_selected_tool();
+        if (selected_tool === 'vunit') {
             return this.vunit;
         }
-        else if ('cocotb' in tool_configuration) {
+        else if (selected_tool === 'cocotb') {
             return this.cocotb;
         }
-        else if ('osvvm' in tool_configuration) {
+        else if (selected_tool === 'osvvm') {
             return this.osvvm;
         }
         else {
             return this.edalize;
         }
     }
-
-
 }

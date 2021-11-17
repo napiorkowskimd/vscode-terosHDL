@@ -39,7 +39,10 @@ export class TreeDataProvider implements vscode.TreeDataProvider<Tree_types.Tree
     }
 
     set_results(results, force_fail_all) {
-        if (results === undefined) {
+        let result_array = results.get_results();
+        let build_array = results.get_builds();
+
+        if (result_array === undefined) {
             return;
         }
         if (force_fail_all === true) {
@@ -48,8 +51,8 @@ export class TreeDataProvider implements vscode.TreeDataProvider<Tree_types.Tree
         }
         for (let i = 0; i < this.test_list_items.length; ++i) {
             const test = this.test_list_items[i];
-            for (let j = 0; j < results.length; j++) {
-                const result = results[j];
+            for (let j = 0; j < result_array.length; j++) {
+                const result = result_array[j];
                 if (test.label === result.name) {
                     if (result.pass === false) {
                         let path_icon_light = path.join(__filename, "..", "..", "..", "..", "resources", "light", "failed.svg");
@@ -69,7 +72,7 @@ export class TreeDataProvider implements vscode.TreeDataProvider<Tree_types.Tree
                 }
             }
         }
-        this.get_build_list_items(results);
+        // this.get_build_list_items(build_array);
         this.update_tree();
     }
 

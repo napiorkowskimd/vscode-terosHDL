@@ -20,9 +20,8 @@
 // along with TerosHDL.  If not, see <https://www.gnu.org/licenses/>.
 
 import * as vscode from 'vscode';
-import { resourceLimits } from 'worker_threads';
 const path_lib = require('path');
-const os = require('os');
+const tool_result = require('./tool_result');
 const shell = require('shelljs');
 const fs = require('fs');
 const tool_base = require('./tool_base');
@@ -147,7 +146,7 @@ exit
     async run_command(command, tests, project_name) {
         let element = this;
 
-        element.output_channel.append(command);
+        element.output_channel.append(command + '\n');
         element.output_channel.show();
 
         shell.cd(this.build_folder);
@@ -175,13 +174,16 @@ exit
     }
 
     async get_result(project_name) {
+        let result = new tool_result.Tool_result();
+
         this.project_name = project_name;
         let result_path = path_lib.join(this.build_folder, `${project_name}.yml`);
         const yaml = require('js-yaml');
-        let results: any[] = [];
+
         if (fs.existsSync(result_path) === false) {
-            return results;
+            return result;
         }
+
         try {
             const result_yaml = yaml.load(fs.readFileSync(result_path, 'utf8'));
             const test_suites = result_yaml['TestSuites'];
@@ -196,18 +198,13 @@ exit
                     }
                     let test_name = test['Name'];
 
-                    let test_info = {
-                        name: test_name,
-                        pass: pass
-                    };
-
-                    results.push(test_info);
+                    result.add_result(test_name, pass);
                 }
                 
             }
 
         } catch (e) {}
-        return results;
+        return result;
     }
 
     get_all_test_fail(tests) {

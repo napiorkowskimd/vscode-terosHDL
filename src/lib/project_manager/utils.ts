@@ -43,13 +43,15 @@ function get_icon(full_path: string, mode: string) {
 }
 
 export async function open_file(path, output_channel) {
+    let is_directory = fs.lstatSync(path).isDirectory();
+
     //Check if file exists
     if (fs.existsSync(path) !== true) {
-        output_channel.show_message(ERROR_CODE.FILE_NOT_FOUND, '');
+        output_channel.show_message(ERROR_CODE.FILE_NOT_FOUND, path);
         return;
     }
     try {
-        if (fs.lstatSync(path).isDirectory()) {
+        if (is_directory) {
             let uri = vscode.Uri.file(path);
             let success = await vscode.commands.executeCommand('revealFileInOS', uri);
             return;
