@@ -368,7 +368,7 @@ icestorm:
         description: "Additional options for the synth_ice40 command."
         type: input_comma
 
-Ise:
+ise:
     title: ISE
     description: "Xilinx ISE Design Suite."
     type: tool
